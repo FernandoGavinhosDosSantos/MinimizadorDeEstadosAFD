@@ -6,8 +6,8 @@ import java.io.IOException;
 
 public class Main {
 
-	private static String[][] matrizAdj;	// representação do AFD por matriz de adjacência
-	private static boolean[] saidas;		// indica quais estados são de aceitação
+	private static String[][] matrizAdj;	// representaÃ§Ã£o do AFD por matriz de adjacÃªncia
+	private static boolean[] saidas;		// indica quais estados sÃ£o de aceitaÃ§Ã£o
 	private static int sigma;				// tamanho do alfabeto
 	private static int ini;					// estado inicial
 
@@ -19,14 +19,14 @@ public class Main {
 
 		try {
 
-			// lê a primeira linha da entrada
+			// lÃª a primeira linha da entrada
 			reader = new BufferedReader(new FileReader(file));
 			String linha = reader.readLine();
 
-			// quebra a linha lida em parâmetros separando pelo caractere espaço
+			// quebra a linha lida em parÃ¢metros separando pelo caractere espaÃ§o
 			String[] param = linha.split(" ");
 
-			// inicializa a matriz de adjacência e de aceitação com tamanho n
+			// inicializa a matriz de adjacÃªncia e de aceitaÃ§Ã£o com tamanho n
 			int n = Integer.parseInt(param[0]);
 			matrizAdj = new String[n][n];
 			saidas = new boolean[n];
@@ -37,16 +37,16 @@ public class Main {
 			// grava estado de entrada
 			ini = Integer.parseInt(param[2]);
 
-			// lê segunda linha
+			// lÃª segunda linha
 			linha = reader.readLine();
 			param = linha.split(" ");
 
-			// grava estados de aceitação
+			// grava estados de aceitaÃ§Ã£o
 			for (int i = 0; i < n; i++){
 				saidas[i] = (param[i].equals("1"));
 			}
 
-			// lê as demais linhas que contém informações sobre as transições
+			// lÃª as demais linhas que contÃ©m informaÃ§Ãµes sobre as transiÃ§Ãµes
 			for (int i = 0; i < n; i++){
 
 				linha = reader.readLine();
@@ -54,10 +54,10 @@ public class Main {
 				
 				for (int j = 0; j < sigma; j++){
 					
-					//se o valor for -1, não há transição a ser adicionada
+					//se o valor for -1, nÃ£o hÃ¡ transiÃ§Ã£o a ser adicionada
 					if (!param[j].equals("-1")) {
 						
-						//qualquer outro valor significa que há uma transição partindo do estado i e chegando no estado param[j] ao receber o valor j
+						//qualquer outro valor significa que hÃ¡ uma transiÃ§Ã£o partindo do estado i e chegando no estado param[j] ao receber o valor j
 						int y = Integer.parseInt(param[j]);
 						if (matrizAdj[i][y] == null) matrizAdj[i][y] = "";
 						matrizAdj[i][y] += (matrizAdj[i][y].isEmpty() ? j : ";" + j);
@@ -65,7 +65,7 @@ public class Main {
 				}
 			}
 
-		//tratamento das exceções
+		//tratamento das exceÃ§Ãµes
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 
@@ -87,7 +87,7 @@ public class Main {
 
 		LerEntrada(args[0]);
 
-		//saída de teste
+		//saÃ­da de teste
 		String linha = "";
 		for (int i = 0; i < matrizAdj.length; i++){
 			for (int j = 0; j < matrizAdj.length; j++){
