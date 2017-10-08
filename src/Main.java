@@ -6,12 +6,12 @@ import java.io.IOException;
 
 public class Main {
 
-	private static String[][] matrizAdj;	// representaÃ§Ã£o do AFD por matriz de adjacÃªncia
-	private static boolean[] saidas;		// indica quais estados sÃ£o de aceitaÃ§Ã£o
+	private static String[][] matrizAdj;	// representação do AFD por matriz de adjacência
+	private static boolean[] saidas;		// indica quais estados são de aceitação
 	private static int sigma;				// tamanho do alfabeto
 	private static int ini;					// estado inicial
 
-	public static void LerEntrada(String dir){
+	private static void LeEntrada(String dir){
 
 		//leitor de arquivos
 		File file = new File(dir);
@@ -19,14 +19,14 @@ public class Main {
 
 		try {
 
-			// lÃª a primeira linha da entrada
+			// lê a primeira linha da entrada
 			reader = new BufferedReader(new FileReader(file));
 			String linha = reader.readLine();
 
-			// quebra a linha lida em parÃ¢metros separando pelo caractere espaÃ§o
+			// quebra a linha lida em parâmetros separando pelo caractere espaço
 			String[] param = linha.split(" ");
 
-			// inicializa a matriz de adjacÃªncia e de aceitaÃ§Ã£o com tamanho n
+			// inicializa a matriz de adjacência e de aceitação com tamanho n
 			int n = Integer.parseInt(param[0]);
 			matrizAdj = new String[n][n];
 			saidas = new boolean[n];
@@ -37,27 +37,27 @@ public class Main {
 			// grava estado de entrada
 			ini = Integer.parseInt(param[2]);
 
-			// lÃª segunda linha
+			// lê segunda linha
 			linha = reader.readLine();
 			param = linha.split(" ");
 
-			// grava estados de aceitaÃ§Ã£o
+			// grava estados de aceitação
 			for (int i = 0; i < n; i++){
 				saidas[i] = (param[i].equals("1"));
 			}
 
-			// lÃª as demais linhas que contÃ©m informaÃ§Ãµes sobre as transiÃ§Ãµes
+			// lê as demais linhas que contém informações sobre as transições
 			for (int i = 0; i < n; i++){
 
 				linha = reader.readLine();
 				param = linha.split(" ");
-				
+
 				for (int j = 0; j < sigma; j++){
-					
-					//se o valor for -1, nÃ£o hÃ¡ transiÃ§Ã£o a ser adicionada
+
+					//se o valor for -1, não há transição a ser adicionada
 					if (!param[j].equals("-1")) {
-						
-						//qualquer outro valor significa que hÃ¡ uma transiÃ§Ã£o partindo do estado i e chegando no estado param[j] ao receber o valor j
+
+						//qualquer outro valor significa que há uma transição partindo do estado i e chegando no estado param[j] ao receber o valor j
 						int y = Integer.parseInt(param[j]);
 						if (matrizAdj[i][y] == null) matrizAdj[i][y] = "";
 						matrizAdj[i][y] += (matrizAdj[i][y].isEmpty() ? j : ";" + j);
@@ -65,7 +65,7 @@ public class Main {
 				}
 			}
 
-		//tratamento das exceÃ§Ãµes
+			//tratamento das exceções
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 
@@ -83,19 +83,39 @@ public class Main {
 		}
 	}
 
-	public static void main(String[] args) {
+	private static String TipoEstado(int i){
 
-		LerEntrada(args[0]);
+		String tipoEstado;
 
-		//saÃ­da de teste
+		//testa se é estado inicial
+		if (i == ini) tipoEstado = "I";
+		//se não for, testa se é estado de aceitação
+		else if (saidas[i]) tipoEstado = "A";
+		//se não, só pode ser um estado neutro
+		else tipoEstado = "N";
+
+		return tipoEstado;
+	}
+
+	private static void TestaConstrucao(){
+
+		//saída para testar a construção da matriz de adjacência
 		String linha = "";
 		for (int i = 0; i < matrizAdj.length; i++){
 			for (int j = 0; j < matrizAdj.length; j++){
+				//se não houver nada em matriz[i,j], não há uma transição saindo do estado i e indo para o estado j
 				if (matrizAdj[i][j] == null) matrizAdj[i][j] = "-1";
-				linha += matrizAdj[i][j] + " ";
+				//(origemTransição [tipoEstado] -> destinoTransição [tipoEstado]) {valorTransição1;valorTransição2,...,valorTransiçãoN}
+				linha += "(" + i + " [" + TipoEstado(i) + "] -> " + j + " [" + TipoEstado(j) + "]) {" + matrizAdj[i][j] + "} ";
 			}
 			System.out.println(linha);
 			linha = "";
 		}
+	}
+
+	public static void main(String[] args) {
+
+		LeEntrada(args[0]);
+		TestaConstrucao();
 	}
 }
