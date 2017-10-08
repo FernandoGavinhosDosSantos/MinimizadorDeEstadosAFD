@@ -3,7 +3,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Stack;
 
@@ -101,7 +100,7 @@ public class Main {
     }
 
     // Implementa a busca em profundidade (DFS) para determinar os estados inacessíveis
-    private static void EstadosInacessiveis(ArrayList<Integer> estadosInacessiveis) {
+    private static void getEstadosInacessiveis(ArrayList<Integer> estadosInacessiveis) {
         // Assume inicialmente que todos os estados são inacessíveis
         for (int i = 0; i < saidas.length; i++) {
             estadosInacessiveis.add(i);
@@ -132,7 +131,31 @@ public class Main {
         estadosInacessiveis.removeAll(visitado);
     }
 
-    private static void TestaEstadosInacessiveis(ArrayList<Integer> estadosInacessiveis) {
+    private static void removeEstados(ArrayList<Integer> estadosParaRemover) {
+        if (estadosParaRemover.size() == 0) return;
+
+        String[][] novaMatrizAdj = new String[saidas.length - 1][saidas.length - 1];
+
+        for (int i = 0; i < matrizAdj.length; i++) {
+            // Pula o estado na linha i que esta inacessível
+            if (!estadosParaRemover.contains(i)) {
+
+                for (int j = 0; j < matrizAdj[i].length; j++) {
+
+                    // Pula o estado na coluna j que esta inacessível
+                    if (!estadosParaRemover.contains(j)) {
+                        int auxI = i > estadosParaRemover.size() ? i - 1 : i;
+                        int auxJ = j > estadosParaRemover.size() ? j - 1 : j;
+
+                        novaMatrizAdj[auxI][auxJ] = matrizAdj[i][j];
+                    }
+                }
+            }
+        }
+        matrizAdj = novaMatrizAdj;
+    }
+
+    private static void printEstadosInacessiveis(ArrayList<Integer> estadosInacessiveis) {
         if (estadosInacessiveis.size() == 0) {
             System.out.println("Não existem estados inacessíveis");
             return;
@@ -145,16 +168,18 @@ public class Main {
         }
         System.out.println();
     }
-    private static void TestaConstrucao() {
 
-        //saída para testar a construção da matriz de adjacência
+    private static void printMatrizAdj() {
+
+        // saída para testar a construção da matriz de adjacência
         String linha = "";
         for (int i = 0; i < matrizAdj.length; i++) {
             for (int j = 0; j < matrizAdj.length; j++) {
                 //se não houver nada em matriz[i,j], não há uma transição saindo do estado i e indo para o estado j
-                if (matrizAdj[i][j] == null) matrizAdj[i][j] = "-1";
+                String valor = matrizAdj[i][j];
+                if (valor == null) valor = "-1";
                 //(origemTransição [tipoEstado] -> destinoTransição [tipoEstado]) {valorTransição1;valorTransição2,...,valorTransiçãoN}
-                linha += "(" + i + " [" + TipoEstado(i) + "] -> " + j + " [" + TipoEstado(j) + "]) {" + matrizAdj[i][j] + "} ";
+                linha += "(" + i + " [" + TipoEstado(i) + "] -> " + j + " [" + TipoEstado(j) + "]) {" + valor + "} ";
             }
             System.out.println(linha);
             linha = "";
@@ -166,9 +191,12 @@ public class Main {
         ArrayList<Integer> estadosInacessiveis = new ArrayList<>();
 
         LeEntrada(args[0]);
-        EstadosInacessiveis(estadosInacessiveis);
+        printMatrizAdj();
 
-        TestaEstadosInacessiveis(estadosInacessiveis);
-        TestaConstrucao();
+        getEstadosInacessiveis(estadosInacessiveis);
+        printEstadosInacessiveis(estadosInacessiveis);
+        removeEstados(estadosInacessiveis);
+
+        printMatrizAdj();
     }
 }
