@@ -99,27 +99,31 @@ public class Main {
         return tipoEstado;
     }
 
-    // Implementa a busca em profundidade (DFS) para determinar os estados inacessíveis
-    private static void getEstadosInacessiveis(ArrayList<Integer> estadosInacessiveis) {
-        // Assume inicialmente que todos os estados são inacessíveis
-        for (int i = 0; i < saidas.length; i++) {
-            estadosInacessiveis.add(i);
+    private static String[][] getMatrizTransposta(String[][] matriz, int ordem) {
+        String[][] novaMatrizAdj = new String[ordem][ordem];
+
+        for (int source = 0; source < ordem; source++) {
+            for (int destination = 0; destination < ordem; destination++) {
+                novaMatrizAdj[source][destination] = matriz[destination][source];
+            }
         }
+        return novaMatrizAdj;
+    }
 
-        // Busca em profundidade para preencher um vetor de estados que conseguiram ser visitados
+    private static ArrayList<Integer> DFS(int inicial, String[][] matriz, ArrayList<Integer> visitado) {
+
         Stack<Integer> pilha = new Stack<>();
-        ArrayList<Integer> visitado = new ArrayList<>();
 
-        pilha.push(ini);
+        pilha.push(inicial);
 
         // Percorre a matriz enquanto a pilha não estiver vazia
         while (!pilha.isEmpty()) {
             int estado = pilha.pop();
             visitado.add(estado);
 
-            for (int i = 0; i < matrizAdj.length; i++) {
+            for (int i = 0; i < matriz.length; i++) {
                 // Se o estado nao estiver na pilha ou nos visitados, adicione na pilha
-                if (matrizAdj[estado][i] != null) {
+                if (matriz[estado][i] != null) {
                     if (!pilha.contains(i) && !visitado.contains(i)) {
                         pilha.push(i);
                     }
@@ -127,14 +131,48 @@ public class Main {
             }
         }
 
+        return visitado;
+    }
+
+    private static void getEstadosInacessiveis(ArrayList<Integer> estadosInacessiveis) {
+        // Assume inicialmente que todos os estados são inacessíveis
+        for (int i = 0; i < saidas.length; i++) {
+            estadosInacessiveis.add(i);
+        }
+
+        ArrayList<Integer> visitado = DFS(ini, matrizAdj, new ArrayList<>());
+
         // Retira os estados que conseguiram ser visitados com a busca em profundidade
         estadosInacessiveis.removeAll(visitado);
     }
 
-    private static void removeEstados(ArrayList<Integer> estadosParaRemover) {
-        if (estadosParaRemover.size() == 0) return;
+    private static void getEstadosInuteis(ArrayList<Integer> estadosInuteis) {
+        // Assume inicialmente que todos os estados são inúteis
+        for (int i = 0; i < saidas.length; i++) {
+            estadosInuteis.add(i);
+        }
 
-        String[][] novaMatrizAdj = new String[saidas.length - 1][saidas.length - 1];
+        ArrayList<Integer> visitado = new ArrayList<>();
+        String[][] matrizTransposta = getMatrizTransposta(matrizAdj, saidas.length);
+
+        // Itera o DFS colocando cada estado de aceitacao como estado inicial
+        for (int i = 0; i < saidas.length; i++) {
+            if (saidas[i]) {
+                DFS(i, matrizTransposta, visitado);
+            }
+        }
+
+        // Retira os estados que conseguiram ser visitados com a busca em profundidade
+        estadosInuteis.removeAll(visitado);
+    }
+
+    private static void removeEstados(ArrayList<Integer> estadosParaRemover) {
+        int tamanhoLista = estadosParaRemover.size();
+
+        if (tamanhoLista == 0) return;
+
+        String[][] novaMatrizAdj = new String[saidas.length - tamanhoLista][saidas.length - tamanhoLista];
+        boolean[] novaSaida = new boolean[saidas.length - tamanhoLista];
 
         for (int i = 0; i < matrizAdj.length; i++) {
             // Pula o estado na linha i que esta inacessível
@@ -144,8 +182,8 @@ public class Main {
 
                     // Pula o estado na coluna j que esta inacessível
                     if (!estadosParaRemover.contains(j)) {
-                        int auxI = i > estadosParaRemover.size() ? i - 1 : i;
-                        int auxJ = j > estadosParaRemover.size() ? j - 1 : j;
+                        int auxI = i > tamanhoLista ? i - tamanhoLista : i;
+                        int auxJ = j > tamanhoLista ? j - tamanhoLista : j;
 
                         novaMatrizAdj[auxI][auxJ] = matrizAdj[i][j];
                     }
@@ -153,17 +191,24 @@ public class Main {
             }
         }
         matrizAdj = novaMatrizAdj;
+
+        for (int i = 0; i < saidas.length; i++) {
+            if (!estadosParaRemover.contains(i)) {
+                int auxI = i > tamanhoLista ? i - tamanhoLista : i;
+                novaSaida[auxI] = saidas[i];
+            }
+        }
+        saidas = novaSaida;
     }
 
-    private static void printEstadosInacessiveis(ArrayList<Integer> estadosInacessiveis) {
-        if (estadosInacessiveis.size() == 0) {
-            System.out.println("Não existem estados inacessíveis");
+    private static void printEstados(ArrayList<Integer> estados, String label) {
+        if (estados.size() == 0) {
+            System.out.println("Não existem estados " + label);
             return;
         }
 
-        // Mostra os indices dos estados inacessíveis
-        System.out.print("Estados inacessíveis: ");
-        for (Integer estado : estadosInacessiveis) {
+        System.out.print("Estados " + label + ": ");
+        for (Integer estado : estados) {
             System.out.print(estado + " ");
         }
         System.out.println();
@@ -189,13 +234,18 @@ public class Main {
     public static void main(String[] args) {
 
         ArrayList<Integer> estadosInacessiveis = new ArrayList<>();
+        ArrayList<Integer> estadosInuteis = new ArrayList<>();
 
         LeEntrada(args[0]);
         printMatrizAdj();
 
         getEstadosInacessiveis(estadosInacessiveis);
-        printEstadosInacessiveis(estadosInacessiveis);
+        printEstados(estadosInacessiveis, "inacessíveis");
         removeEstados(estadosInacessiveis);
+
+        getEstadosInuteis(estadosInuteis);
+        printEstados(estadosInuteis, "inúteis");
+        removeEstados(estadosInuteis);
 
         printMatrizAdj();
     }
