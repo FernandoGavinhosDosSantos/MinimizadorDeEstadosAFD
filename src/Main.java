@@ -100,11 +100,11 @@ public class Main {
         return tipoEstado;
     }
 
-    // Implementa a busca em profundidade (DFS) para determinar os estados inuteis
-    private static void EstadosInuteis(ArrayList<Integer> estadosInuteis) {
-        // Assume inicialmente que todos os estados sao inuteis
+    // Implementa a busca em profundidade (DFS) para determinar os estados inacessíveis
+    private static void EstadosInacessiveis(ArrayList<Integer> estadosInacessiveis) {
+        // Assume inicialmente que todos os estados são inacessíveis
         for (int i = 0; i < saidas.length; i++) {
-            estadosInuteis.add(i);
+            estadosInacessiveis.add(i);
         }
 
         // Busca em profundidade para preencher um vetor de estados que conseguiram ser visitados
@@ -129,20 +129,18 @@ public class Main {
         }
 
         // Retira os estados que conseguiram ser visitados com a busca em profundidade
-        for (Integer estado : visitado) {
-            estadosInuteis.remove(estado);
-        }
+        estadosInacessiveis.removeAll(visitado);
     }
 
-    private static void TestaEstadosInuteis(ArrayList<Integer> estadosInuteis) {
-        if (estadosInuteis.size() == 0) {
-            System.out.println("Nao existe estados inuteis");
+    private static void TestaEstadosInacessiveis(ArrayList<Integer> estadosInacessiveis) {
+        if (estadosInacessiveis.size() == 0) {
+            System.out.println("Não existem estados inacessíveis");
             return;
         }
 
-        // Mostra os indices dos estados inuteis
-        System.out.print("Estados inuteis: ");
-        for (Integer estado : estadosInuteis) {
+        // Mostra os indices dos estados inacessíveis
+        System.out.print("Estados inacessíveis: ");
+        for (Integer estado : estadosInacessiveis) {
             System.out.print(estado + " ");
         }
         System.out.println();
@@ -165,12 +163,12 @@ public class Main {
 
     public static void main(String[] args) {
 
-        ArrayList<Integer> estadosInuteis = new ArrayList<>();
+        ArrayList<Integer> estadosInacessiveis = new ArrayList<>();
 
         LeEntrada(args[0]);
-        EstadosInuteis(estadosInuteis);
+        EstadosInacessiveis(estadosInacessiveis);
 
-        TestaEstadosInuteis(estadosInuteis);
+        TestaEstadosInacessiveis(estadosInacessiveis);
         TestaConstrucao();
     }
 }
